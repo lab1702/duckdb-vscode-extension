@@ -168,6 +168,10 @@ Complete DuckDB VS Code integration featuring:
 This extension follows the VS Code extension guidelines:
 * [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ## For More Information
 
 * [VS Code Extension API](https://code.visualstudio.com/api)

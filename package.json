@@ -3,6 +3,7 @@
   "displayName": "DuckDB CLI Integration",
   "description": "Smart DuckDB CLI integration: execute selections, statements, or entire files with intelligent cursor navigation",
   "version": "0.0.1",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.102.0"
   },
