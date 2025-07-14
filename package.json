@@ -1,0 +1,82 @@
+{
+  "name": "duckdb-ext",
+  "displayName": "DuckDB CLI Integration",
+  "description": "Smart DuckDB CLI integration: execute selections, statements, or entire files with intelligent cursor navigation",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.102.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:sql"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "duckdb-ext.createTerminal",
+        "title": "DuckDB: Create Terminal Session"
+      },
+      {
+        "command": "duckdb-ext.executeQuery",
+        "title": "DuckDB: Execute Query (Smart Detection)"
+      },
+      {
+        "command": "duckdb-ext.executeSelection",
+        "title": "DuckDB: Execute Selection"
+      },
+      {
+        "command": "duckdb-ext.executeFile",
+        "title": "DuckDB: Execute Entire File"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "duckdb-ext.executeQuery",
+        "key": "ctrl+enter",
+        "when": "editorTextFocus && resourceExtname == .sql"
+      },
+      {
+        "command": "duckdb-ext.executeFile",
+        "key": "ctrl+shift+enter",
+        "when": "editorTextFocus && resourceExtname == .sql"
+      }
+    ],
+    "configuration": {
+      "title": "DuckDB",
+      "properties": {
+        "duckdb.cliPath": {
+          "type": "string",
+          "default": "duckdb",
+          "description": "Path to the DuckDB CLI executable"
+        },
+        "duckdb.defaultDatabase": {
+          "type": "string",
+          "default": ":memory:",
+          "description": "Default database to connect to (use :memory: for in-memory database)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.102.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
