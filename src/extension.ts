@@ -96,7 +96,7 @@ async function executeQuery(): Promise<void> {
 /**
  * Executes the entire file content
  */
-function executeEntireFile(): void {
+async function executeEntireFile(): Promise<void> {
 	const editor = vscode.window.activeTextEditor;
 	
 	if (!editor) {
@@ -109,17 +109,17 @@ function executeEntireFile(): void {
 		vscode.window.showWarningMessage('No DuckDB terminal found. Creating one...');
 		createDuckDBTerminal();
 		// Wait a moment for terminal to be ready
-		setTimeout(() => executeEntireFileInternal(editor), 1000);
+		setTimeout(async () => await executeEntireFileInternal(editor), 1000);
 		return;
 	}
 
-	executeEntireFileInternal(editor);
+	await executeEntireFileInternal(editor);
 }
 
 /**
  * Internal function to execute the entire file
  */
-function executeEntireFileInternal(editor: vscode.TextEditor): void {
+async function executeEntireFileInternal(editor: vscode.TextEditor): Promise<void> {
 	const textToExecute = editor.document.getText().trim();
 	
 	if (!textToExecute) {
@@ -129,9 +129,19 @@ function executeEntireFileInternal(editor: vscode.TextEditor): void {
 
 	// Send to terminal
 	if (duckdbTerminal) {
+		// Show terminal to display output
 		duckdbTerminal.show();
 		duckdbTerminal.sendText(textToExecute);
 		vscode.window.showInformationMessage('Entire file executed in DuckDB terminal');
+		
+		// Restore focus to the editor after a brief delay
+		setTimeout(async () => {
+			await vscode.window.showTextDocument(editor.document, {
+				viewColumn: editor.viewColumn,
+				preserveFocus: false,
+				selection: editor.selection
+			});
+		}, 100);
 	}
 }
 
@@ -258,6 +268,7 @@ async function executeQueryInternal(editor: vscode.TextEditor): Promise<void> {
 
 	// Send to terminal
 	if (duckdbTerminal) {
+		// Show terminal to display output but preserve editor reference
 		duckdbTerminal.show();
 		duckdbTerminal.sendText(textToExecute);
 		
@@ -281,10 +292,14 @@ async function executeQueryInternal(editor: vscode.TextEditor): Promise<void> {
 			await handleCursorMovementAfterStatementExecution(editor, originalPosition);
 		}
 		
-		// Set focus back to the editor
-		vscode.window.showTextDocument(editor.document, editor.viewColumn, false).then(() => {
-			// Focus is now on the editor, ready for next Ctrl+Enter
-		});
+		// Restore focus to the editor after a brief delay to allow terminal output to be visible
+		setTimeout(async () => {
+			await vscode.window.showTextDocument(editor.document, {
+				viewColumn: editor.viewColumn,
+				preserveFocus: false,
+				selection: editor.selection
+			});
+		}, 100); // 100ms delay should be enough for the terminal to show the command
 	}
 }
 
@@ -310,7 +325,7 @@ async function handleCursorMovementAfterStatementExecution(editor: vscode.TextEd
 /**
  * Executes only the current selection
  */
-function executeSelection(): void {
+async function executeSelection(): Promise<void> {
 	const editor = vscode.window.activeTextEditor;
 	
 	if (!editor) {
@@ -328,17 +343,17 @@ function executeSelection(): void {
 		vscode.window.showWarningMessage('No DuckDB terminal found. Creating one...');
 		createDuckDBTerminal();
 		// Wait a moment for terminal to be ready
-		setTimeout(() => executeSelectionInternal(editor), 1000);
+		setTimeout(async () => await executeSelectionInternal(editor), 1000);
 		return;
 	}
 
-	executeSelectionInternal(editor);
+	await executeSelectionInternal(editor);
 }
 
 /**
  * Internal function to execute selection
  */
-function executeSelectionInternal(editor: vscode.TextEditor): void {
+async function executeSelectionInternal(editor: vscode.TextEditor): Promise<void> {
 	const selection = editor.selection;
 	const textToExecute = editor.document.getText(selection).trim();
 	
@@ -349,9 +364,19 @@ function executeSelectionInternal(editor: vscode.TextEditor): void {
 
 	// Send to terminal
 	if (duckdbTerminal) {
+		// Show terminal to display output
 		duckdbTerminal.show();
 		duckdbTerminal.sendText(textToExecute);
 		vscode.window.showInformationMessage('Selected SQL executed in DuckDB terminal');
+		
+		// Restore focus to the editor after a brief delay
+		setTimeout(async () => {
+			await vscode.window.showTextDocument(editor.document, {
+				viewColumn: editor.viewColumn,
+				preserveFocus: false,
+				selection: editor.selection
+			});
+		}, 100);
 	}
 }
 
