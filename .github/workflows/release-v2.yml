@@ -1,4 +1,4 @@
-name: Release Extension
+name: Release Extension v2
 
 on:
   release:
@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: write
-  packages: write
+  actions: write
 
 jobs:
   release:
@@ -48,15 +48,16 @@ jobs:
     - name: Package extension
       run: vsce package
       
-    - name: Get extension info
-      id: extension_info
+    - name: Get VSIX filename
+      id: vsix_info
       run: |
-        VSIX_FILE=$(ls *.vsix)
+        VSIX_FILE=$(ls *.vsix | head -1)
+        echo "Found VSIX file: $VSIX_FILE"
         echo "vsix_file=$VSIX_FILE" >> $GITHUB_OUTPUT
-        echo "extension_name=$(echo $VSIX_FILE | sed 's/\.vsix$//')" >> $GITHUB_OUTPUT
       
-    - name: Upload VSIX to release
+    - name: Upload VSIX using GitHub CLI
       run: |
-        gh release upload ${{ github.event.release.tag_name }} ${{ steps.extension_info.outputs.vsix_file }} --clobber
+        echo "Uploading ${{ steps.vsix_info.outputs.vsix_file }} to release ${{ github.event.release.tag_name }}"
+        gh release upload ${{ github.event.release.tag_name }} ${{ steps.vsix_info.outputs.vsix_file }} --clobber
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
