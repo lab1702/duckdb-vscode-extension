@@ -1,0 +1,52 @@
+name: Release Extension
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run linter
+      run: npm run lint
+      
+    - name: Compile TypeScript
+      run: npm run compile
+      
+    - name: Run tests
+      run: npm test
+      
+    - name: Install VSCE
+      run: npm install -g @vscode/vsce
+      
+    - name: Package extension
+      run: vsce package
+      
+    - name: Get extension info
+      id: extension_info
+      run: |
+        VSIX_FILE=$(ls *.vsix)
+        echo "vsix_file=$VSIX_FILE" >> $GITHUB_OUTPUT
+        echo "extension_name=$(echo $VSIX_FILE | sed 's/\.vsix$//')" >> $GITHUB_OUTPUT
+      
+    - name: Upload VSIX to release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ steps.extension_info.outputs.vsix_file }}
+        fail_on_unmatched_files: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

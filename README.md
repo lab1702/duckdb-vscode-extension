@@ -46,10 +46,35 @@ winget install duckdb.cli
 
 ## Installation
 
-1. Clone this repository
-2. Run `npm install` to install dependencies
-3. Open the project in VS Code
-4. Press `F5` to launch the Extension Development Host
+### From GitHub Release (Recommended)
+1. Go to the [Releases page](https://github.com/lab1702/duckdb-vscode-extension/releases)
+2. Download the latest `.vsix` file from the release assets
+3. In VS Code: `Ctrl+Shift+P` → "Extensions: Install from VSIX..."
+4. Select the downloaded `.vsix` file
+
+### From GitHub Actions Build
+1. Go to the [Actions tab](https://github.com/lab1702/duckdb-vscode-extension/actions)
+2. Click on the latest successful "Build and Test Extension" workflow run
+3. Download the `duckdb-extension-*` artifact
+4. Extract the `.vsix` file and install it in VS Code
+
+### From Source
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/lab1702/duckdb-vscode-extension.git
+   cd duckdb-vscode-extension
+   ```
+2. Install dependencies and build:
+   ```bash
+   npm install
+   npm run compile
+   ```
+3. Package the extension:
+   ```bash
+   npm install -g @vscode/vsce
+   vsce package
+   ```
+4. Install the generated `.vsix` file in VS Code
 
 ## Development
 
@@ -152,6 +177,16 @@ Complete DuckDB VS Code integration featuring:
 - Intelligent statement detection and parsing
 - Comprehensive error handling and user feedback
 - Full TypeScript implementation with testing
+
+## Automated Builds
+
+This extension uses GitHub Actions for automated building and releasing:
+
+- **Every push to main**: Builds and tests the extension, uploads VSIX as artifact
+- **Every release**: Automatically builds, tests, packages, and attaches VSIX to the release
+- **Quality assurance**: All releases are automatically tested before packaging
+
+See [RELEASE.md](RELEASE.md) for detailed release process documentation.
 
 ---
 

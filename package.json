@@ -4,6 +4,14 @@
   "description": "Smart DuckDB CLI integration: execute selections, statements, or entire files with intelligent cursor navigation",
   "version": "0.0.1",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lab1702/duckdb-vscode-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lab1702/duckdb-vscode-extension/issues"
+  },
+  "homepage": "https://github.com/lab1702/duckdb-vscode-extension#readme",
   "engines": {
     "vscode": "^1.102.0"
   },
