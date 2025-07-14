@@ -48,12 +48,20 @@ The GitHub Actions workflow (`release.yml`) will:
 2. **Quality Checks:**
    - Run ESLint to check code quality
    - Compile TypeScript to ensure no compilation errors
-   - Run the full test suite
+   - Setup virtual display (xvfb) for headless VS Code testing
+   - Run the full test suite in headless mode
 
 3. **Package Extension:**
    - Install the VS Code Extension Manager (`@vscode/vsce`)
    - Package the extension into a `.vsix` file
    - Upload the `.vsix` file to the GitHub release
+
+### CI/CD Testing
+
+The workflows use `xvfb` (X Virtual Framebuffer) to run VS Code tests in headless environments:
+- Virtual display is configured with screen resolution 1024x768x24
+- Tests run with proper environment variables for CI compatibility
+- Ensures consistent testing across local and CI environments
 
 ### Manual Release (Alternative)
 
