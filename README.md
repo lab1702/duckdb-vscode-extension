@@ -37,9 +37,11 @@ sudo mv duckdb /usr/local/bin/
 
 **Windows:**
 ```bash
-# Download from https://duckdb.org/docs/installation/
-# Or use package managers like chocolatey
-choco install duckdb
+# Using winget (recommended)
+winget install duckdb.cli
+
+# Or download from https://duckdb.org/docs/installation/
+# Or use chocolatey: choco install duckdb
 ```
 
 ## Installation
