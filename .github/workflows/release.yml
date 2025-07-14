@@ -56,9 +56,7 @@ jobs:
         echo "extension_name=$(echo $VSIX_FILE | sed 's/\.vsix$//')" >> $GITHUB_OUTPUT
       
     - name: Upload VSIX to release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: ${{ steps.extension_info.outputs.vsix_file }}
-        fail_on_unmatched_files: true
+      run: |
+        gh release upload ${{ github.event.release.tag_name }} ${{ steps.extension_info.outputs.vsix_file }} --clobber
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
