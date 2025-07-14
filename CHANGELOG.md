@@ -2,9 +2,17 @@
 
 All notable changes to the "duckdb-ext" extension will be documented in this file.
 
-## [0.0.2] - 2025-07-14
+## [0.0.3] - 2025-07-14
 
 ### Fixed
+
+- **Cursor Position Behavior**: Fixed issue where pressing `Ctrl+Enter` when positioned after the last statement would re-execute the last statement. Now properly shows "No SQL statement found at cursor position" warning when cursor is positioned in empty space after all statements
+- **Statement Detection Logic**: Improved statement detection to prevent accidental execution when cursor is on empty lines or positioned after all file content
+- **Boundary Validation**: Enhanced cursor position validation to ensure statements are only executed when cursor is actually within statement boundaries
+
+## [0.0.2] - 2025-07-14
+
+### Improvements
 
 - **Focus Management**: Fixed issue where focus was not returning to the editor after executing statements with `Ctrl+Enter`. The editor now properly regains focus after query execution, allowing for seamless statement-by-statement execution workflow
 

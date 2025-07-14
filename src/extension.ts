@@ -183,6 +183,7 @@ function findStatementAtCursor(document: vscode.TextDocument, position: vscode.P
 	}
 	
 	// If no statement found with semicolon, try to find a logical statement around cursor
+	// But only if the cursor is actually positioned within or at the start of content
 	return findLogicalStatementAtCursor(document, position);
 }
 
@@ -194,35 +195,79 @@ function findLogicalStatementAtCursor(document: vscode.TextDocument, position: v
 	const currentLine = position.line;
 	const totalLines = document.lineCount;
 	
+	// Check if cursor is on a completely empty line or only whitespace line
+	const currentLineText = document.lineAt(currentLine).text;
+	const cursorColumn = position.character;
+	
+	// If cursor is at the end of a line and the line is empty or only has whitespace after cursor
+	if (cursorColumn >= currentLineText.trim().length && currentLineText.trim() === '') {
+		// Check if there are any non-empty lines below this position
+		let hasContentBelow = false;
+		for (let line = currentLine + 1; line < totalLines; line++) {
+			const lineText = document.lineAt(line).text.trim();
+			if (lineText.length > 0 && !lineText.startsWith('--')) {
+				hasContentBelow = true;
+				break;
+			}
+		}
+		
+		// If no content below and we're on an empty line, don't find any statement
+		if (!hasContentBelow) {
+			return null;
+		}
+	}
+	
+	// Check if cursor is positioned after all content in the file
+	const textFromCursor = document.getText(new vscode.Range(position, new vscode.Position(totalLines - 1, document.lineAt(totalLines - 1).text.length)));
+	if (textFromCursor.trim() === '') {
+		// Cursor is after all content, don't execute anything
+		return null;
+	}
+	
 	// Start from current line and expand up and down to find statement boundaries
 	let startLine = currentLine;
 	let endLine = currentLine;
 	
-	// Expand upward to find start of statement
-	while (startLine > 0) {
-		const lineText = document.lineAt(startLine - 1).text.trim();
-		if (lineText === '' || lineText.startsWith('--') || 
-			lineText.toLowerCase().match(/^(select|insert|update|delete|create|drop|alter|with)/)) {
-			break;
+	// Check if current line has any content that the cursor is within
+	const currentLineContent = currentLineText.trim();
+	if (currentLineContent.length > 0 && !currentLineContent.startsWith('--')) {
+		// Cursor is on a line with content, proceed with statement detection
+		
+		// Expand upward to find start of statement
+		while (startLine > 0) {
+			const lineText = document.lineAt(startLine - 1).text.trim();
+			if (lineText === '' || lineText.startsWith('--') || 
+				lineText.toLowerCase().match(/^(select|insert|update|delete|create|drop|alter|with)/)) {
+				break;
+			}
+			startLine--;
 		}
-		startLine--;
+		
+		// Expand downward to find end of statement
+		while (endLine < totalLines - 1) {
+			const lineText = document.lineAt(endLine + 1).text.trim();
+			if (lineText === '' || lineText.startsWith('--') || 
+				lineText.toLowerCase().match(/^(select|insert|update|delete|create|drop|alter|with)/)) {
+				break;
+			}
+			endLine++;
+		}
+		
+		// Get the text from startLine to endLine
+		const range = new vscode.Range(startLine, 0, endLine, document.lineAt(endLine).text.length);
+		const statementText = document.getText(range).trim();
+		
+		// Additional check: make sure the cursor is actually within the statement bounds
+		const statementStart = document.offsetAt(new vscode.Position(startLine, 0));
+		const statementEnd = document.offsetAt(new vscode.Position(endLine, document.lineAt(endLine).text.length));
+		const cursorOffset = document.offsetAt(position);
+		
+		if (cursorOffset >= statementStart && cursorOffset <= statementEnd && statementText.length > 0) {
+			return statementText;
+		}
 	}
 	
-	// Expand downward to find end of statement
-	while (endLine < totalLines - 1) {
-		const lineText = document.lineAt(endLine + 1).text.trim();
-		if (lineText === '' || lineText.startsWith('--') || 
-			lineText.toLowerCase().match(/^(select|insert|update|delete|create|drop|alter|with)/)) {
-			break;
-		}
-		endLine++;
-	}
-	
-	// Get the text from startLine to endLine
-	const range = new vscode.Range(startLine, 0, endLine, document.lineAt(endLine).text.length);
-	const statementText = document.getText(range).trim();
-	
-	return statementText.length > 0 ? statementText : null;
+	return null;
 }
 
 /**
