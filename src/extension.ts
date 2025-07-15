@@ -2,6 +2,10 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+// Constants
+const TERMINAL_READY_DELAY = 1000; // milliseconds to wait for terminal to be ready
+const FOCUS_RESTORE_DELAY = 100; // milliseconds to wait before restoring editor focus
+
 // Global variable to keep track of the DuckDB terminal
 let duckdbTerminal: vscode.Terminal | undefined;
 
@@ -57,17 +61,22 @@ function createDuckDBTerminal(): void {
 		duckdbTerminal.dispose();
 	}
 
-	// Create new terminal
-	duckdbTerminal = vscode.window.createTerminal({
-		name: 'DuckDB CLI',
-		shellPath: cliPath,
-		shellArgs: [defaultDatabase]
-	});
+	try {
+		// Create new terminal
+		duckdbTerminal = vscode.window.createTerminal({
+			name: 'DuckDB CLI',
+			shellPath: cliPath,
+			shellArgs: [defaultDatabase]
+		});
 
-	// Show the terminal
-	duckdbTerminal.show();
+		// Show the terminal
+		duckdbTerminal.show();
 
-	vscode.window.showInformationMessage('DuckDB terminal session created!');
+		vscode.window.showInformationMessage('DuckDB terminal session created!');
+	} catch (error) {
+		vscode.window.showErrorMessage(`Failed to create DuckDB terminal: ${error instanceof Error ? error.message : 'Unknown error'}`);
+		duckdbTerminal = undefined;
+	}
 }
 
 /**
@@ -86,7 +95,7 @@ async function executeQuery(): Promise<void> {
 		vscode.window.showWarningMessage('No DuckDB terminal found. Creating one...');
 		createDuckDBTerminal();
 		// Wait a moment for terminal to be ready
-		setTimeout(async () => await executeQueryInternal(editor), 1000);
+		setTimeout(async () => await executeQueryInternal(editor), TERMINAL_READY_DELAY);
 		return;
 	}
 
@@ -109,7 +118,7 @@ async function executeEntireFile(): Promise<void> {
 		vscode.window.showWarningMessage('No DuckDB terminal found. Creating one...');
 		createDuckDBTerminal();
 		// Wait a moment for terminal to be ready
-		setTimeout(async () => await executeEntireFileInternal(editor), 1000);
+		setTimeout(async () => await executeEntireFileInternal(editor), TERMINAL_READY_DELAY);
 		return;
 	}
 
@@ -344,7 +353,7 @@ async function executeQueryInternal(editor: vscode.TextEditor): Promise<void> {
 				preserveFocus: false,
 				selection: editor.selection
 			});
-		}, 100); // 100ms delay should be enough for the terminal to show the command
+		}, FOCUS_RESTORE_DELAY); // Brief delay should be enough for the terminal to show the command
 	}
 }
 
@@ -431,7 +440,6 @@ async function executeSelectionInternal(editor: vscode.TextEditor): Promise<void
  */
 function findNextStatementPosition(document: vscode.TextDocument, currentPosition: vscode.Position): vscode.Position | null {
 	const text = document.getText();
-	const cursorOffset = document.offsetAt(currentPosition);
 	
 	// Find the current statement's end position first
 	const currentStatementEnd = findCurrentStatementEnd(document, currentPosition);

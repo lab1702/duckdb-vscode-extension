@@ -9,11 +9,11 @@ suite('DuckDB Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
 	test('Extension should be present', () => {
-		assert.ok(vscode.extensions.getExtension('undefined_publisher.duckdb-ext'));
+		assert.ok(vscode.extensions.getExtension('lab1702.duckdb-ext'));
 	});
 
 	test('Extension should activate', async () => {
-		const extension = vscode.extensions.getExtension('undefined_publisher.duckdb-ext');
+		const extension = vscode.extensions.getExtension('lab1702.duckdb-ext');
 		if (extension && !extension.isActive) {
 			await extension.activate();
 		}
@@ -22,7 +22,7 @@ suite('DuckDB Extension Test Suite', () => {
 
 	test('Commands should be registered after activation', async () => {
 		// Ensure extension is activated first
-		const extension = vscode.extensions.getExtension('undefined_publisher.duckdb-ext');
+		const extension = vscode.extensions.getExtension('lab1702.duckdb-ext');
 		if (extension && !extension.isActive) {
 			await extension.activate();
 		}

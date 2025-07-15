@@ -2,7 +2,8 @@
   "name": "duckdb-ext",
   "displayName": "DuckDB CLI Integration",
   "description": "Smart DuckDB CLI integration: execute selections, statements, or entire files with intelligent cursor navigation",
-  "version": "0.0.3",
+  "publisher": "lab1702",
+  "version": "0.0.4",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -15,8 +16,17 @@
   "engines": {
     "vscode": "^1.102.0"
   },
+  "keywords": [
+    "duckdb",
+    "database",
+    "sql",
+    "cli",
+    "analytics",
+    "data science"
+  ],
   "categories": [
-    "Other"
+    "Other",
+    "Data Science"
   ],
   "activationEvents": [
     "onLanguage:sql"
